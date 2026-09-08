@@ -1,0 +1,5 @@
+service vendor.oplus-charger-hal /odm/bin/hw/vendor.oplus.hardware.charger-V6-service
+    class hal
+    user root
+    group root system
+    interface aidl vendor.oplus.hardware.charger.ICharger/default

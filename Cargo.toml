@@ -1,0 +1,50 @@
+[package]
+name = "vendor_oplus_charger"
+version = "11.0.0"
+edition = "2021"
+description = "OPlus Charger AIDL HAL adapter for Xiaomi devices running ColorOS"
+license = "Apache-2.0"
+readme = "README.md"
+include = [
+    "aidl/**/*.aidl",
+    "src/**/*.rs",
+    "tools/*.sh",
+    "Android.bp",
+    "build.rs",
+    "build.sh",
+    "./charger-hal-service.rc",
+    "./charger-hal-service.xml",
+    "Cargo.lock",
+    "LICENSE",
+    "README.md",
+]
+
+[[bin]]
+name = "vendor-oplus-hardware-charger-service"
+path = "src/main.rs"
+
+[dependencies]
+# Android binder
+rsbinder = { version = "=0.10.0", features = ["android_10_plus"] }
+async-trait = "0.1"
+
+# Logging
+tracing = "=0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "registry"] }
+tracing-log = "=0.2"
+tracing-logcat = "=0.1"
+
+# Utilities
+anyhow = "=1.0"
+parking_lot = "0.12"
+libc = "0.2"
+
+[build-dependencies]
+rsbinder-aidl = "=0.10.0"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = false
+panic = "abort"

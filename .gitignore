@@ -1,0 +1,18 @@
+# Rust build output
+/target/
+
+# Generated packaging output. Run ./build.sh to recreate it.
+/dist/
+
+# Locally built or downloaded device binaries
+/vendor.oplus.hardware.charger-V6-service-sdk*
+*.apk
+*.img
+*.zip
+
+# Local development files
+.DS_Store
+.idea/
+.vscode/
+*.log
+*.swp

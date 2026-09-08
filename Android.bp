@@ -1,0 +1,14 @@
+// Packages the Cargo/NDK-built service binary into /odm/bin/hw.
+// Run `ANDROID_NDK_HOME=<ndk> ./build.sh release` before invoking Soong.
+
+cc_prebuilt_binary {
+    name: "vendor.oplus.hardware.charger-V6-service",
+    srcs: ["dist/vendor.oplus.hardware.charger-V6-service"],
+    device_specific: true,
+    relative_install_path: "hw",
+    strip: {
+        none: true,
+    },
+    init_rc: ["charger-hal-service.rc"],
+    vintf_fragments: ["charger-hal-service.xml"],
+}
