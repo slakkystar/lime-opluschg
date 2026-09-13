@@ -317,10 +317,28 @@ const BATTERY_TYPE_PATHS: &[&str] = &[
 const INPUT_CURRENT_MAX_PATHS: &[&str] = &[
     "/sys/class/qcom-battery/fg1_current_max",
     "/sys/class/qcom-battery/constant_power",
-    "/sys/class/qcom-battery/restrict_cur",
     "/sys/class/power_supply/usb_main/constant_charge_current_max",
     "/sys/class/power_supply/usb/current_max",
     "/sys/class/power_supply/usb_main/input_current_max",
+    // restrict_cur is a static limit/threshold (AICL/thermal restrict),
+    // not the actual charging current. On some qpnp-smb5 platforms
+    // (Redmi 9T and similar) this node is always present with the same
+    // value regardless of whether charging is active, so it must not
+    // rank above the live "current_max"/"input_current_settled" nodes -
+    // otherwise the power calculation gets permanently stuck on this value.
+    "/sys/class/qcom-battery/restrict_cur",
+];
+
+// "Settled" nodes reflect what the PMIC has actually negotiated with the
+// adapter right now (0 when idle, a live value while charging) - this is
+// the most reliable source for computing real charging power on qpnp-smb5.
+const INPUT_CURRENT_SETTLED_PATHS: &[&str] = &[
+    "/sys/class/power_supply/main/input_current_settled",
+    "/sys/class/power_supply/usb/input_current_settled",
+];
+const INPUT_VOLTAGE_SETTLED_PATHS: &[&str] = &[
+    "/sys/class/power_supply/main/input_voltage_settled",
+    "/sys/class/power_supply/usb/input_voltage_settled",
 ];
 const ADAPTER_POWER_PATHS: &[&str] = &[
     "/sys/class/qcom-battery/apdo_max",
@@ -506,6 +524,8 @@ pub struct ChargerInfo {
     pub(crate) charge_state: ChargeState,
     pub input_current_max: i32,
     pub input_voltage_max: i32,
+    pub input_current_settled: i32,
+    pub input_voltage_settled: i32,
     pub fastchg_mode: i32,
     pub current_state: String,
     pub sport_mode: i32,
@@ -685,6 +705,8 @@ impl Default for ChargerInfo {
             charge_state: ChargeState::Unknown,
             input_current_max: 0,
             input_voltage_max: 0,
+            input_current_settled: 0,
+            input_voltage_settled: 0,
             fastchg_mode: 0,
             current_state: String::new(),
             sport_mode: 0,
@@ -1052,6 +1074,8 @@ impl Adapter {
 
         info.input_current_max = read_int_any(INPUT_CURRENT_MAX_PATHS);
         info.input_voltage_max = read_int(&format!("{}/voltage_max", PSY_USB));
+        info.input_current_settled = read_int_any(INPUT_CURRENT_SETTLED_PATHS);
+        info.input_voltage_settled = read_int_any(INPUT_VOLTAGE_SETTLED_PATHS);
         info.fastchg_mode = read_int_any(FASTCHG_MODE_PATHS);
         info.current_state = read_string(CURRENT_STATE);
         info.sport_mode = read_int(SPORT_MODE);
@@ -1372,6 +1396,22 @@ impl Adapter {
             let total_i = info.cp_master_iin.saturating_add(info.cp_slave_iin);
             if v > 0 && total_i > 0 {
                 return Self::power_watts(v, total_i);
+            }
+        }
+        // Most accurate source on qpnp-smb5 platforms (Redmi 9T and similar):
+        // "settled" current and voltage are what the PMIC has actually
+        // negotiated with the adapter right now. Both are 0 when idle,
+        // so using them is safe and won't cause false positives.
+        if info.input_current_settled > 0 {
+            let v = if info.input_voltage_settled > 0 {
+                info.input_voltage_settled
+            } else if info.usb_voltage_now > 0 {
+                info.usb_voltage_now
+            } else {
+                info.battery_voltage_now
+            };
+            if v > 0 {
+                return Self::power_watts(v, info.input_current_settled);
             }
         }
         let v = if info.usb_voltage_now > 0 {
