@@ -3,10 +3,10 @@
 set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN="${1:-$ROOT/dist/vendor.oplus.hardware.charger-V6-service}"
+BIN="${1:-$ROOT/dist/vendor.oplus.hardware.charger-V3-service}"
 
 INTERFACE_VERSION="$(sed -n 's/^pub const INTERFACE_VERSION: i32 = \([0-9][0-9]*\);$/\1/p' "$ROOT/src/lib.rs")"
-VINTF_VERSION="$(sed -n 's/^[[:space:]]*<version>\([0-9][0-9]*\)<\/version>.*$/\1/p' "$ROOT/charger-hal-service.xml")"
+VINTF_VERSION="$(sed -n 's/^[[:space:]]*<version>\([0-9][0-9]*\)<\/version>.*$/\1/p' "$ROOT/manifest_oplus_charger_aidl.xml")"
 [ -n "$INTERFACE_VERSION" ]
 [ "$INTERFACE_VERSION" = "11" ]
 [ "$VINTF_VERSION" = "6" ]
@@ -97,7 +97,7 @@ if printf '%s\n' "$DECIMAL_BODY" | rg 'read_|write_|sleep|request_refresh|thread
     exit 1
 fi
 
-if rg -n 'group .*wakelock|write /sys/power/wake' "$ROOT/charger-hal-service.rc"; then
+if rg -n 'group .*wakelock|write /sys/power/wake' "$ROOT/vendor.oplus.hardware.charger-V3-service.rc"; then
     echo "error: init service requests wake-lock access" >&2
     exit 1
 fi

@@ -21,7 +21,7 @@ This is a ROM integration component, not an APK.
 - `aarch64-linux-android` / `arm64-v8a` only.
 - Native link target: Android API 26.
 - Tested toolchain: Rust stable and Android NDK r29.
-- VINTF AIDL version: 6.
+- VINTF AIDL version: 3.
 - Binder stable-interface metadata: version 11.
 
 The API range describes Binder protocol compatibility. Hardware behavior still
@@ -59,8 +59,8 @@ The release binary and Soong package are generated under `target/` and
 
 1. Add the source tree to the ROM/device build tree.
 2. Run `./build.sh release` before invoking Soong.
-3. Include `Android.bp`, `charger-hal-service.rc`, and `charger-hal-service.xml`.
-4. Build the `vendor.oplus.hardware.charger-V6-service` module. It installs to `/odm/bin/hw`.
+3. Include `Android.bp`, `vendor.oplus.hardware.charger-V3-service.rc`, and `manifest_oplus_charger_aidl.xml`.
+4. Build the `vendor.oplus.hardware.charger-V3-service` module. It installs to `/odm/bin/hw`.
 5. Add target-specific SELinux rules and verify all writable sysfs nodes.
 6. Check VINTF merging, init logs, and Binder registration before flashing.
 
@@ -91,7 +91,7 @@ latency. Do not run it on a primary device.
 - Charging node names, units, permissions, and control behavior vary by kernel.
 - Some OPlus methods are stubs because the target Xiaomi kernel lacks the corresponding hardware.
 - Authentication and short-circuit health values include target-specific compatibility behavior.
-- Keep VINTF version 6 and Binder metadata version 11 together; changing only one can break integration.
+- Keep VINTF version 3 and Binder metadata version 11 together; changing only one can break integration.
 
 ## License
 

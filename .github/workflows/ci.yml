@@ -60,4 +60,4 @@ jobs:
           ./build.sh release
 
       - name: Validate Android binary
-        run: ./tools/validate-static.sh dist/vendor.oplus.hardware.charger-V6-service
+        run: ./tools/validate-static.sh dist/vendor.oplus.hardware.charger-V3-service
