@@ -2,7 +2,7 @@
 name = "vendor_oplus_charger"
 version = "11.0.0"
 edition = "2021"
-description = "OPlus Charger AIDL HAL adapter for Xiaomi devices running ColorOS"
+description = "OPlus Charger AIDL HAL adapter for Redmi 9T running ColorOS"
 license = "Apache-2.0"
 readme = "README.md"
 include = [

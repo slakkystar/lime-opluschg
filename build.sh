@@ -74,3 +74,13 @@ file "$BIN"
 echo "==> ROM replacement: $OUT_BIN"
 ls -lh "$OUT_BIN"
 echo "==> Soong prebuilt: $DIST_DIR/vendor.oplus.hardware.charger-V3-service"
+
+ODM_DIR="$SCRIPT_DIR/odm"
+mkdir -p "$ODM_DIR/bin/hw" "$ODM_DIR/etc/init" "$ODM_DIR/etc/vintf/manifest"
+cp "$DIST_DIR/vendor.oplus.hardware.charger-V3-service" "$ODM_DIR/bin/hw/vendor.oplus.hardware.charger-V3-service"
+cp "$DIST_DIR/vendor.oplus.hardware.charger-V3-service.rc" "$ODM_DIR/etc/init/vendor.oplus.hardware.charger-V3-service.rc"
+cp "$DIST_DIR/manifest_oplus_charger_aidl.xml" "$ODM_DIR/etc/vintf/manifest/manifest_oplus_charger_aidl.xml"
+chmod 0755 "$ODM_DIR/bin/hw/vendor.oplus.hardware.charger-V3-service"
+
+echo "==> odm/ layout: $ODM_DIR"
+find "$ODM_DIR" -type f -exec ls -lh {} \;

@@ -1,6 +1,6 @@
-# OPlus Charger HAL Adapter
+# OPlus Charger HAL Adapter for Lime (Redmi 9T)
 
-Rust/NDK implementation of the native `ICharger` HAL for Xiaomi devices
+Rust/NDK implementation of the native `ICharger` HAL for Lime
 running ColorOS. It reads standard `power_supply` and Xiaomi `qcom-battery`
 sysfs nodes and exposes:
 

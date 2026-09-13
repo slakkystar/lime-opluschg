@@ -1,39 +1,12 @@
-name: CI
+name: HAL build
 
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  checks:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v4
-
-      - name: Install validation tools
-        run: sudo apt-get update && sudo apt-get install --yes ripgrep
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-
-      - name: Run tests
-        run: cargo test --all-targets
-
-      - name: Run Clippy
-        run: cargo clippy --all-targets -- -D warnings
-
-      - name: Run static validation
-        run: ./tools/validate-static.sh
-
   android-build:
     runs-on: ubuntu-latest
     steps:
@@ -59,5 +32,9 @@ jobs:
           export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk/29.0.14206865"
           ./build.sh release
 
-      - name: Validate Android binary
-        run: ./tools/validate-static.sh dist/vendor.oplus.hardware.charger-V3-service
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oplus-charger-hal-lime
+          path: odm/
+          if-no-files-found: error

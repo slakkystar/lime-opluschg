@@ -1,5 +1,7 @@
 # Rust build output
 /target/
+/out/
+/odm/
 
 # Generated packaging output. Run ./build.sh to recreate it.
 /dist/
